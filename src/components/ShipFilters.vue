@@ -1,0 +1,181 @@
+<template>
+  <div class="filters-panel">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Search</label>
+        <input
+          v-model="store.searchQuery"
+          type="text"
+          placeholder="Ship name..."
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>Nation</label>
+        <select v-model="store.selectedNation">
+          <option :value="null">All Nations</option>
+          <option v-for="(nation, key) in store.nations" :key="key" :value="key">
+            {{ nation.title }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Class</label>
+        <select v-model="store.selectedType">
+          <option :value="null">All Classes</option>
+          <option v-for="(type, key) in store.types" :key="key" :value="key">
+            {{ type.title }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Tier</label>
+        <select v-model="store.selectedTier">
+          <option :value="null">All Tiers</option>
+          <option v-for="tier in 11" :key="tier" :value="tier">
+            Tier {{ toRomanTier(tier) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select v-model="store.sortBy">
+          <option value="level-desc">Tier (High to Low)</option>
+          <option value="level-asc">Tier (Low to High)</option>
+          <option value="title">Name (A-Z)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filters-footer">
+      <label class="checkbox-label">
+        <input v-model="store.isPremiumOnly" type="checkbox" />
+        <span>Premium & Special Only</span>
+      </label>
+
+      <button @click="store.resetFilters" class="reset-btn">
+        Reset Filters
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useShipsStore } from '../store/useShipsStore';
+import { toRomanTier } from '../utils/roman';
+
+const store = useShipsStore();
+</script>
+
+<style lang="scss" scoped>
+
+.filters-panel {
+  background-color: $color-panel;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+  @media (min-width: 640px) {
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    @media (min-width: 480px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: $color-muted;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    input, select {
+      width: 100%;
+      background-color: $color-dark;
+      border: 1px solid $color-border;
+      border-radius: $radius-sm;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      color: $color-text;
+      outline: none;
+      transition: $transition-default;
+
+      &:focus {
+        border-color: $color-accent;
+      }
+    }
+  }
+
+  .filters-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid $color-border;
+    padding-top: 1rem;
+    gap: 1rem;
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 0.875rem;
+      user-select: none;
+
+      input {
+        margin-right: 0.5rem;
+        width: 16px;
+        height: 16px;
+        accent-color: $color-gold;
+      }
+
+      span {
+        color: $color-gold;
+        font-weight: bold;
+      }
+    }
+
+    .reset-btn {
+      background: none;
+      border: none;
+      color: $color-muted;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: $transition-default;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+}
+</style>
