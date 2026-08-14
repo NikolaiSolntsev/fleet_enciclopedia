@@ -23,7 +23,6 @@ import ShipFilters from '@/components/ships/ShipFilters.vue';
 import ShipGrid from '@/components/ships/ShipGrid.vue';
 import ScrollToTop from '@/components/common/ScrollToTop.vue';
 
-// Async компоненты для оптимизации бандла
 const ShipModal = defineAsyncComponent(() =>
   import('./components/ships/ShipModal.vue')
 );

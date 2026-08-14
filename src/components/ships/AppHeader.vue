@@ -6,15 +6,15 @@
           <AnchorIcon color="white"/>
         </div>
         <h1 class="title">
-          World of Warships <span>Fleet Encyclopedia</span>
+          World of Warships <span>{{t('header_title') || 'fleet encyclopedia'}}</span>
         </h1>
       </div>
 
       <div class="header-right">
-        <div class="stats">
-          Total Ships: <strong>{{ store.ships.length }}</strong> |
-          Showing: <span>{{ store.filteredShips.length }}</span>
-        </div>
+      <div class="stats">
+    {{ t('total_ships') }}: <strong>{{ store.ships.length }}</strong> | 
+    {{ t('showing') }}: <span>{{ store.filteredShips.length }}</span>
+  </div>
         <LanguageSwitcher />
       </div>
     </div>
@@ -25,6 +25,9 @@
 import { useShipsStore } from '@/store/useShipsStore';
 import AnchorIcon from '../ui/BaseAnchorIcon.vue';
 import LanguageSwitcher from '../common/LanguageSwitcher.vue';
+import { useTranslation } from 'i18next-vue';
+
+const { t } = useTranslation();
 const store = useShipsStore();
 </script>
 
@@ -115,6 +118,7 @@ const store = useShipsStore();
         display: block;
         letter-spacing: 0.5px;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+        text-transform: uppercase;
 
         @media (min-width: 480px) {
           font-size: 0.65em;

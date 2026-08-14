@@ -13,10 +13,10 @@
 
           <div class="modal-badges">
             <span class="tier-tag">
-              Tier {{ toRomanTier(ship.level) }}
+              {{t('tier') || 'Tier'}} {{ toRomanTier(ship.level) }}
             </span>
             <span v-if="ship.is_premium" class="premium-tag">
-              PREMIUM VEHICLE
+              {{t('premium_vehicle') || 'premium vehicle'}}
             </span>
           </div>
         </div>
@@ -28,12 +28,12 @@
           </div>
 
           <div class="ship-description">
-            <h4>Overview</h4>
+            <h4>{{ t('overview') || 'Overview' }}</h4>
             <p>{{ ship.description || 'No detailed historical description available for this vehicle.' }}</p>
           </div>
 
           <div class="modal-actions">
-            <button @click="close" class="btn-close">Close</button>
+            <button @click="close" class="btn-close">{{ t('close') || "Close" }}</button>
           </div>
         </div>
 
@@ -46,9 +46,11 @@
 import { computed } from 'vue';
 import { useShipsStore } from '@/store/useShipsStore';
 import { toRomanTier } from '@/utils/toRomanTier';
+import { useTranslation } from 'i18next-vue';
 
 const store = useShipsStore();
 const ship = computed(() => store.selectedShip);
+const { t } =useTranslation();
 
 const nationTitle = computed(() => (ship.value ? store.nations[ship.value.nation]?.title : ''));
 const typeTitle = computed(() => (ship.value ? store.types[ship.value.type]?.title : ''));
@@ -163,6 +165,7 @@ function close() {
         border: 1px solid rgba($color-gold, 0.5);
         padding: 0.25rem 0.5rem;
         border-radius: $radius-sm;
+        text-transform: uppercase;
       }
     }
   }

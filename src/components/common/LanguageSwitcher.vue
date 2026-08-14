@@ -1,12 +1,12 @@
 <template>
   <div class="language-switcher">
-    <button class="globe-btn" @click="isOpen = !isOpen" title="Select Language">
+    <button class="globe-btn" @click="isOpen = !isOpen" :title="t('select_lang', 'Select Language')">
       <GlobalIcon size="24" color="#9ca3af"/>
       <span class="lang-code">{{ store.currentLanguage.toUpperCase() }}</span>
     </button>
 
     <div v-if="isOpen" class="dropdown-menu">
-      <div class="dropdown-header">Select Language</div>
+      <div class="dropdown-header">{{ t('select_lang', 'Select Language') }}</div>
       <button
         v-for="lang in store.availableLanguages"
         :key="lang"
@@ -24,9 +24,11 @@
 import { ref } from 'vue';
 import { useShipsStore } from '@/store/useShipsStore';
 import  GlobalIcon from '../ui/BaseGlobalIcon.vue';
+import { useTranslation } from 'i18next-vue';
 
 const store = useShipsStore();
 const isOpen = ref(false);
+const { t, i18next} = useTranslation();
 
 const languageNames: Record<string, string> = {
   en: 'English',
@@ -56,6 +58,7 @@ function getLanguageName(lang: string): string {
 
 function selectLanguage(lang: string) {
   store.setLanguage(lang);
+  i18next.changeLanguage(lang);
   isOpen.value = false;
 }
 </script>

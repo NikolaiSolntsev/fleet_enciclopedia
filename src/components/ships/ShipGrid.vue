@@ -5,17 +5,17 @@
     </div>
 
     <div v-else-if="store.error" class="state-box error">
-      <p class="title">Failed to load fleet data</p>
+      <p class="title">{{ t('filed_to_load') || "Failed to load fleet data"}}</p>
       <p class="subtitle">{{ store.error }}</p>
-      <button @click="store.loadData" class="retry-btn">Retry</button>
+      <button @click="store.loadData" class="retry-btn">{{ t('retry') || "Retry" }}</button>
     </div>
 
     <div v-else-if="store.filteredShips.length === 0" class="state-box empty">
       <div class="icon">🔍</div>
-      <h3 class="title">No ships found</h3>
-      <p class="subtitle">Try relaxing your search query or filters.</p>
+      <h3 class="title">{{ t('not_found') || "Shps not found" }}</h3>
+      <p class="subtitle">{{ t('to_simplify') || "Try relaxing your search query or filters."}}</p>
       <button @click="store.resetFilters" class="reset-btn">
-        Reset All Filters
+        {{ t('reset_filters') || "Reset all filters" }}
       </button>
     </div>
 
@@ -24,23 +24,22 @@
         <ShipCard v-for="ship in store.filteredShips" :key="ship.id" :ship="ship" />
       </div>
 
-      <!-- Infinite Scroll Trigger -->
       <div
         v-if="store.hasMore"
         ref="loadMoreTrigger"
         class="load-more-trigger"
       >
         <button v-if="!store.isLoadingMore" @click="store.loadMore" class="load-more-btn">
-          Load More Ships
+          {{ t('load_more') || "Load More Ships" }}
         </button>
         <div v-else class="loading-indicator">
-          <span>Loading...</span>
+          <span>{{t('loading') || "Loading..."}}"</span>
         </div>
       </div>
 
       <!-- Stats -->
       <div class="grid-stats">
-        Showing {{ store.filteredShips.length }} of {{ store.totalFilteredCount }} ships
+       {{ t('showing') || 'Showing'}} {{ store.filteredShips.length }} {{ t('of') || 'of'}} {{ store.totalFilteredCount }}
       </div>
     </div>
   </section>
@@ -51,9 +50,11 @@ import { useShipsStore } from '@/store/useShipsStore';
 import ShipCard from './ShipCard.vue';
 import ShipCardSkeleton from './ShipCardSkeleton.vue';
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useTranslation } from 'i18next-vue';
 
 const store = useShipsStore();
 const loadMoreTrigger = ref<HTMLElement>();
+  const { t } = useTranslation();
 
 let intersectionObserver: IntersectionObserver | null = null;
 
@@ -117,7 +118,7 @@ onUnmounted(() => {
 
   .subtitle {
     font-size: 0.875rem;
-    color: $color-muted;
+    color: $color-text;
     margin-bottom: 1rem;
   }
 

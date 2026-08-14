@@ -4,7 +4,7 @@
       v-if="isVisible"
       @click="scrollToTop"
       class="scroll-to-top"
-      title="Back to top"
+      :title="t('back_to_top', 'Back to top')"
       aria-label="Back to top"
     >
       ↑
@@ -13,9 +13,11 @@
 </template>
 
 <script setup lang="ts">
+import { useTranslation } from 'i18next-vue';
 import { ref, onMounted, onUnmounted } from 'vue';
 
 const isVisible = ref(false);
+const { t } = useTranslation();
 
 function handleScroll() {
   isVisible.value = window.scrollY > 300;

@@ -2,7 +2,7 @@
   <div class="filters-panel">
     <div class="filters-grid">
       <div class="filter-group">
-        <label>Search</label>
+        <label>{{ t('search') || 'Search' }}</label>
         <input
           v-model="store.searchQuery"
           type="text"
@@ -11,9 +11,9 @@
       </div>
 
       <div class="filter-group">
-        <label>Nation</label>
+        <label>{{t('nation') || 'Nation'}}</label>
         <select v-model="store.selectedNation">
-          <option :value="null">All Nations</option>
+          <option :value="null">{{t('all_nation') || 'All nations'}}</option>
           <option v-for="(nation, key) in store.nations" :key="key" :value="key">
             {{ nation.title }}
           </option>
@@ -21,9 +21,9 @@
       </div>
 
       <div class="filter-group">
-        <label>Class</label>
+        <label>{{t('class') || 'class'}}</label>
         <select v-model="store.selectedType">
-          <option :value="null">All Classes</option>
+          <option :value="null">{{t('all_classes') || 'All Classes'}}</option>
           <option v-for="(type, key) in store.types" :key="key" :value="key">
             {{ type.title }}
           </option>
@@ -31,21 +31,21 @@
       </div>
 
       <div class="filter-group">
-        <label>Tier</label>
+        <label>{{t('tier') || 'tier'}}</label>
         <select v-model="store.selectedTier">
-          <option :value="null">All Tiers</option>
+          <option :value="null">{{t('all_tiers') || 'All tiers'}}</option>
           <option v-for="tier in 11" :key="tier" :value="tier">
-            Tier {{ toRomanTier(tier) }}
+            {{t('tier') || 'Tier'}} {{ toRomanTier(tier) }}
           </option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label>Sort By</label>
+        <label>{{t('sort_by') || 'sort by'}}</label>
         <select v-model="store.sortBy">
-          <option value="level-desc">Tier (High to Low)</option>
-          <option value="level-asc">Tier (Low to High)</option>
-          <option value="title">Name (A-Z)</option>
+          <option value="level-desc">{{t('sort_level_desc') || 'Tier (High to Low)'}}</option>
+          <option value="level-asc">{{t('sort_level_asc') || 'Tier (Low to High)'}}</option>
+          <option value="title">{{t('sort_by_name') || 'Name (A-Z)'}}</option>
         </select>
       </div>
     </div>
@@ -53,11 +53,11 @@
     <div class="filters-footer">
       <label class="checkbox-label">
         <input v-model="store.isPremiumOnly" type="checkbox" />
-        <span>Premium & Special Only</span>
+        <span>{{t('premium_only') || 'Premiun & Special Only'}}</span>
       </label>
 
       <button @click="store.resetFilters" class="reset-btn">
-        Reset Filters
+        {{ t('reset_filters') || 'reset filters'}}
       </button>
     </div>
   </div>
@@ -66,9 +66,10 @@
 <script setup lang="ts">
 import { useShipsStore } from '@/store/useShipsStore';
 import { toRomanTier } from '@/utils/toRomanTier';
+import { useTranslation } from 'i18next-vue';
 
 const store = useShipsStore();
-
+const { t } = useTranslation();
 </script>
 
 <style lang="scss" scoped>

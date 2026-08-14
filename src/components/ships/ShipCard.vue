@@ -17,7 +17,7 @@
       </div>
 
       <div v-if="ship.is_premium" class="premium-badge">
-        ★ PREMIUM
+        ★ {{ (t('premium')) || 'PREMIUM' }}
       </div>
     </div>
 
@@ -32,7 +32,7 @@
       </div>
 
       <div class="card-action">
-        <span>View Details →</span>
+        <span>{{t('view_details') || 'View details →'}} </span>
       </div>
     </div>
   </div>
@@ -43,12 +43,14 @@ import { computed } from 'vue';
 import type { Ship } from '@/types/shipTypes';
 import { useShipsStore } from '@/store/useShipsStore';
 import { toRomanTier } from '@/utils/toRomanTier';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{ ship: Ship }>();
 const store = useShipsStore();
 
 const nationTitle = computed(() => store.nations[props.ship.nation]?.title || props.ship.nation);
 const typeTitle = computed(() => store.types[props.ship.type]?.title || props.ship.type);
+const { t } = useTranslation();
 </script>
 
 <style lang="scss" scoped>
@@ -154,13 +156,13 @@ const typeTitle = computed(() => store.types[props.ship.type]?.title || props.sh
       padding: 0.15rem 0.5rem;
       border-radius: $radius-sm;
       border: 1px solid rgba($color-gold, 0.4);
+      text-transform: uppercase;
     }
   }
 
   .card-info {
     padding: 1rem;
     background-color: $color-panel;
-    // border-top: 1px solid rgba($color-border, 0.5);
     flex-grow: 1;
     display: flex;
     flex-direction: column;
