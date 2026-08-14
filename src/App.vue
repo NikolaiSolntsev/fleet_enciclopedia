@@ -11,16 +11,22 @@
 
     <ShipModal />
 
+    <ScrollToTop />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, defineAsyncComponent } from 'vue';
 import { useShipsStore } from './store/useShipsStore';
-import AppHeader from './components/AppHeader.vue';
-import ShipFilters from './components/ShipFilters.vue';
-import ShipGrid from './components/ShipGrid.vue';
-import ShipModal from './components/ShipModal.vue';
+import AppHeader from './components/ships/AppHeader.vue';
+import ShipFilters from '@/components/ships/ShipFilters.vue';
+import ShipGrid from '@/components/ships/ShipGrid.vue';
+import ScrollToTop from '@/components/common/ScrollToTop.vue';
+
+// Async компоненты для оптимизации бандла
+const ShipModal = defineAsyncComponent(() =>
+  import('./components/ships/ShipModal.vue')
+);
 
 const store = useShipsStore();
 

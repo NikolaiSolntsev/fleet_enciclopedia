@@ -1,4 +1,4 @@
-import type { Ship, Nation, VehicleType } from '../types/wow';
+import type { Ship, Nation, VehicleType } from '../types/shipTypes';
 
 const BASE_URL = '/api-wows/api/encyclopedia/en';
 

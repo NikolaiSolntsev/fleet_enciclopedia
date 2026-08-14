@@ -44,8 +44,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useShipsStore } from '../store/useShipsStore';
-import { toRomanTier } from '../utils/roman';
+import { useShipsStore } from '@/store/useShipsStore';
+import { toRomanTier } from '@/utils/toRomanTier';
 
 const store = useShipsStore();
 const ship = computed(() => store.selectedShip);

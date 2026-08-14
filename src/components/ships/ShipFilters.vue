@@ -64,21 +64,25 @@
 </template>
 
 <script setup lang="ts">
-import { useShipsStore } from '../store/useShipsStore';
-import { toRomanTier } from '../utils/roman';
+import { useShipsStore } from '@/store/useShipsStore';
+import { toRomanTier } from '@/utils/toRomanTier';
 
 const store = useShipsStore();
+
 </script>
 
 <style lang="scss" scoped>
 
 .filters-panel {
-  background-color: $color-panel;
-  border: 1px solid $color-border;
+  background: linear-gradient(135deg, #2a5f6f 0%, #1a3f4f 50%, #0f2a35 100%);
+  border: 2px solid #3a7f8f;
   border-radius: $radius-md;
   padding: 1rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.1),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 6px rgba(0, 0, 0, 0.3);
 
   @media (min-width: 640px) {
     padding: 1.25rem;
@@ -117,18 +121,31 @@ const store = useShipsStore();
 
     input, select {
       width: 100%;
-      background-color: $color-dark;
-      border: 1px solid $color-border;
+      background-color: $color-panel;
+      border: 2px solid #3a7f8f;
       border-radius: $radius-sm;
       padding: 0.5rem 0.75rem;
       font-size: 0.875rem;
       color: $color-text;
       outline: none;
       transition: $transition-default;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
 
       &:focus {
-        border-color: $color-accent;
+        border-color: $color-emerald;
+        box-shadow: 0 0px 15px 10px $color-emerald;
       }
+    }
+
+    select option {
+      background-color: $color-panel;
+      color: $color-text;
+    }
+
+    select option:checked {
+      background: linear-gradient(#3a7f8f, #3a7f8f);
+      color: #1fffbc;
     }
   }
 

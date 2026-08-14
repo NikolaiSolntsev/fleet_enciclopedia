@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { fetchShipsData } from '../services/api';
-import type { Ship, Nation, VehicleType } from '../types/wow';
+import type { Ship, Nation, VehicleType } from '../types/shipTypes';
 
 const LANG_STORAGE_KEY = 'wow-catalog-lang';
 const DEFAULT_LANG = 'en';
+const ITEMS_PER_PAGE = 20;
 
 function getSavedLanguage(): string {
   if (typeof localStorage !== 'undefined') {
@@ -28,6 +29,11 @@ export const useShipsStore = defineStore('ships', () => {
   const currentLanguage = ref<string>(getSavedLanguage());
   const availableLanguages = ref<string[]>([]);
 
+  // Пагинация
+  const currentPage = ref(1);
+  const isLoadingMore = ref(false);
+
+  // Фильтры
   const searchQuery = ref('');
   const selectedNation = ref<string | null>(null);
   const selectedType = ref<string | null>(null);
@@ -39,6 +45,7 @@ export const useShipsStore = defineStore('ships', () => {
   async function loadData() {
     isLoading.value = true;
     error.value = null;
+    currentPage.value = 1;
     try {
       const data = await fetchShipsData(currentLanguage.value);
       ships.value = data.ships;
@@ -68,9 +75,15 @@ export const useShipsStore = defineStore('ships', () => {
     selectedTier.value = null;
     isPremiumOnly.value = false;
     sortBy.value = 'level-desc';
+    currentPage.value = 1;
   }
 
-  const filteredShips = computed(() => {
+  function loadMore() {
+    currentPage.value++;
+  }
+
+  // Оптимизированная фильтрация - всех кораблей
+  const allFilteredShips = computed(() => {
     let result = ships.value.filter(ship => {
       if (searchQuery.value && !ship.title.toLowerCase().includes(searchQuery.value.toLowerCase())) {
         return false;
@@ -93,11 +106,27 @@ export const useShipsStore = defineStore('ships', () => {
     return result;
   });
 
+  // Пагинированные корабли для отображения
+  const filteredShips = computed(() => {
+    const start = 0;
+    const end = currentPage.value * ITEMS_PER_PAGE;
+    return allFilteredShips.value.slice(start, end);
+  });
+
+  // Общее количество отфильтрованных кораблей
+  const totalFilteredCount = computed(() => allFilteredShips.value.length);
+
+  // Есть ли ещё корабли для загрузки
+  const hasMore = computed(() => {
+    return filteredShips.value.length < totalFilteredCount.value;
+  });
+
   return {
     ships,
     nations,
     types,
     isLoading,
+    isLoadingMore,
     error,
     searchQuery,
     selectedNation,
@@ -108,8 +137,12 @@ export const useShipsStore = defineStore('ships', () => {
     selectedShip,
     currentLanguage,
     availableLanguages,
+    currentPage,
     filteredShips,
+    totalFilteredCount,
+    hasMore,
     loadData,
+    loadMore,
     resetFilters,
     setLanguage
   };

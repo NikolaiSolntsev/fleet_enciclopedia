@@ -6,9 +6,10 @@
   >
     <div class="card-media">
       <img
-        :src="ship.icons.medium || ship.icons.small"
+        :src="ship.icons.medium || ship.icons.small || ship.icons.default"
         :alt="ship.title"
         loading="lazy"
+        decoding="async"
       />
       
       <div class="tier-badge">
@@ -39,9 +40,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Ship } from '../types/wow';
-import { useShipsStore } from '../store/useShipsStore';
-import { toRomanTier } from '../utils/roman';
+import type { Ship } from '@/types/shipTypes';
+import { useShipsStore } from '@/store/useShipsStore';
+import { toRomanTier } from '@/utils/toRomanTier';
 
 const props = defineProps<{ ship: Ship }>();
 const store = useShipsStore();
@@ -53,8 +54,8 @@ const typeTitle = computed(() => store.types[props.ship.type]?.title || props.sh
 <style lang="scss" scoped>
 
 .ship-card {
-  background-color: $color-card;
-  border: 1px solid $color-border;
+  background: linear-gradient(135deg, #2a5f6f 0%, #1a3f4f 50%, #0f2a35 100%);
+  border: 2px solid #3a7f8f;
   border-radius: $radius-md;
   overflow: hidden;
   cursor: pointer;
@@ -62,6 +63,10 @@ const typeTitle = computed(() => store.types[props.ship.type]?.title || props.sh
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.1),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.3);
 
   &:hover {
     transform: translateY(-4px);
@@ -105,7 +110,7 @@ const typeTitle = computed(() => store.types[props.ship.type]?.title || props.sh
   .card-media {
     position: relative;
     height: 140px;
-    background: linear-gradient(180deg, $color-panel 0%, $color-dark 100%);
+    background:  linear-gradient(180deg, #2a5f6f 0%, #1a3f4f 50%, $color-panel 100%);;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -155,7 +160,7 @@ const typeTitle = computed(() => store.types[props.ship.type]?.title || props.sh
   .card-info {
     padding: 1rem;
     background-color: $color-panel;
-    border-top: 1px solid rgba($color-border, 0.5);
+    // border-top: 1px solid rgba($color-border, 0.5);
     flex-grow: 1;
     display: flex;
     flex-direction: column;

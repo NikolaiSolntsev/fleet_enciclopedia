@@ -2,6 +2,7 @@
   <div class="language-switcher">
     <button class="globe-btn" @click="isOpen = !isOpen" title="Select Language">
       <GlobalIcon size="24" color="#9ca3af"/>
+      <span class="lang-code">{{ store.currentLanguage.toUpperCase() }}</span>
     </button>
 
     <div v-if="isOpen" class="dropdown-menu">
@@ -21,8 +22,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useShipsStore } from '../store/useShipsStore';
-import  GlobalIcon from './GlobalIcon.vue';
+import { useShipsStore } from '@/store/useShipsStore';
+import  GlobalIcon from '../ui/BaseGlobalIcon.vue';
 
 const store = useShipsStore();
 const isOpen = ref(false);
@@ -67,16 +68,25 @@ function selectLanguage(lang: string) {
   .globe-btn {
     background: none;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
     transition: transform 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 0.5rem;
 
     &:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
+    }
+
+    .lang-code {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #9ca3af;
+      letter-spacing: 1px;
+      min-width: 24px;
+      text-align: center;
     }
   }
 
@@ -84,14 +94,16 @@ function selectLanguage(lang: string) {
     position: absolute;
     top: 100%;
     right: 0;
-    background-color: #1a1f2e;
-    border: 1px solid #2d3748;
+    background-color: rgba($color-panel, 0.9);
+    border: 2px solid $color-emerald;
     border-radius: 0.375rem;
     margin-top: 0.5rem;
     min-width: 200px;
     max-height: 320px;
     overflow-y: auto;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    box-shadow:
+      inset 1px 1px 0px rgba(255, 255, 255, 0.1),
+      0 10px 15px -3px rgba(0, 0, 0, 0.5);
     z-index: 100;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -105,11 +117,11 @@ function selectLanguage(lang: string) {
       font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
-      color: #9ca3af;
-      border-bottom: 1px solid #2d3748;
+      color: $color-muted;
+      border-bottom: 2px solid #3a7f8f;
       position: sticky;
       top: 0;
-      background-color: #1a1f2e;
+      background: $color-panel;
       z-index: 1;
     }
 
@@ -117,22 +129,26 @@ function selectLanguage(lang: string) {
       width: 100%;
       padding: 0.75rem 1rem;
       background: none;
-      border: none;
       text-align: left;
       cursor: pointer;
-      color: #e5e7eb;
+      color: $color-muted;
       font-size: 0.875rem;
-      transition: all 0.2s;
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+      transition: all 0.15s ease-in-out;
 
       &:hover {
-        background-color: #2d3748;
-        color: #60a5fa;
+        box-shadow:  inset 0 0 20px 5px $color-emerald;
+        color: #1fffbc;
       }
 
       &.active {
-        background-color: #3b82f6;
-        color: white;
+        border-top: 1px solid $color-emerald;
+        border-bottom: 1px solid $color-emerald;
+        box-shadow:  inset 0 0 20px 5px $color-emerald;
+        color: $color-text;
         font-weight: bold;
+        padding-left: 0.75rem;
       }
     }
   }
