@@ -3,7 +3,10 @@
     <div v-if="ship" class="modal-overlay" @click.self="close">
       <div class="modal-container" :class="{ 'is-premium': ship.is_premium }">
 
-        <div class="modal-media">
+        <div
+          class="modal-media"
+          :style="nationFlag ? { '--nation-flag': `url(${nationFlag})` } : undefined"
+        >
           <button @click="close" class="close-btn">✕</button>
 
           <img
@@ -23,8 +26,19 @@
 
         <div class="modal-body">
           <div class="ship-header">
-            <h2 class="title">{{ ship.title }}</h2>
-            <p class="meta">{{ nationTitle }} • {{ typeTitle }}</p>
+            <div class="ship-header-text">
+              <h2 class="title">{{ ship.title }}</h2>
+              <p class="meta">{{ nationTitle }} • {{ typeTitle }}</p>
+            </div>
+
+            <div v-if="typeIcons.length" class="modal-type-icons">
+              <img
+                v-for="icon in typeIcons"
+                :key="icon.key"
+                :src="icon.src"
+                :alt="`${typeTitle} ${icon.key}`"
+              />
+            </div>
           </div>
 
           <div class="ship-description">
@@ -54,6 +68,24 @@ const { t } =useTranslation();
 
 const nationTitle = computed(() => (ship.value ? store.nations[ship.value.nation]?.title : ''));
 const typeTitle = computed(() => (ship.value ? store.types[ship.value.type]?.title : ''));
+
+const nationFlag = computed(() => (ship.value ? store.nations[ship.value.nation]?.icons?.large : '') || '');
+
+const typeIcons = computed(() => {
+  const icons = ship.value ? store.types[ship.value.type]?.icons : undefined;
+  if (!icons) return [];
+
+  const tags = ship.value?.tags || [];
+  const isSpecial = tags.includes('special') || tags.includes('uiSpecial') || ship.value?.is_special === true;
+  const isPremium = tags.includes('premium') || tags.includes('uiPremium') || ship.value?.is_premium === true;
+
+  return [
+    { key: 'normal', src: icons.normal },
+    { key: 'elite', src: icons.elite },
+    { key: 'special', src: isSpecial ? icons.special : '' },
+    { key: 'premium', src: isPremium ? icons.premium : '' }
+  ].filter((icon): icon is { key: string; src: string } => Boolean(icon.src));
+});
 
 function close() {
   store.selectedShip = null;
@@ -98,8 +130,9 @@ function close() {
     border-color: $color-gold;
 
     .tier-tag {
-      background-color: $color-gold;
+      background: $color-gold;
       color: $color-dark;
+      border-color: $color-gold;
     }
     .title {
       color: $color-gold;
@@ -115,6 +148,18 @@ function close() {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-image: var(--nation-flag, none);
+      background-size: cover;
+      background-position: center;
+      opacity: 0.35;
+      pointer-events: none;
+    }
 
     .close-btn {
       position: absolute;
@@ -139,6 +184,8 @@ function close() {
     }
 
     img {
+      position: relative;
+      z-index: 1;
       max-height: 100%;
       object-fit: contain;
       filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
@@ -146,6 +193,7 @@ function close() {
 
     .modal-badges {
       position: absolute;
+      z-index: 2;
       bottom: 1rem;
       left: 1.5rem;
       display: flex;
@@ -157,8 +205,13 @@ function close() {
         font-size: 1.1rem;
         padding: 0.25rem 0.75rem;
         border-radius: $radius-sm;
-        background-color: $color-accent;
-        color: $color-dark;
+        background: linear-gradient(
+          90deg,
+          rgba($color-panel, 0.75) 0%,
+          rgba($color-emerald, 0.75) 100%
+        );
+        color: $color-accent;
+        border: 1px solid $color-accent;
       }
 
       .premium-tag {
@@ -186,6 +239,28 @@ function close() {
 
     .ship-header {
       flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+
+      .ship-header-text {
+        min-width: 0;
+      }
+
+      .modal-type-icons {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        img {
+          height: 48px;
+          max-width: 48px;
+          width: auto;
+          object-fit: contain;
+        }
+      }
 
       .title {
         font-size: 1.5rem;

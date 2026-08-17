@@ -1,6 +1,11 @@
 <template>
   <div class="language-switcher">
-    <button class="globe-btn" @click="isOpen = !isOpen" :title="t('select_lang', 'Select Language')">
+    <button
+      class="globe-btn"
+      @click="isOpen = !isOpen"
+      :data-tooltip="t('select_lang', 'Select Language')"
+      data-tooltip-align="right"
+    >
       <GlobalIcon size="24" color="#9ca3af"/>
       <span class="lang-code">{{ store.currentLanguage.toUpperCase() }}</span>
     </button>

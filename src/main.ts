@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import './style.css'
+import './assets/styles/tooltip.scss'
 import App from './App.vue'
 import { createPinia } from 'pinia';
 import i18nextVue from 'i18next-vue';

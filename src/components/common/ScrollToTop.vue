@@ -4,7 +4,9 @@
       v-if="isVisible"
       @click="scrollToTop"
       class="scroll-to-top"
-      :title="t('back_to_top', 'Back to top')"
+      :data-tooltip="t('back_to_top', 'Back to top')"
+      data-tooltip-position="top"
+      data-tooltip-align="right"
       aria-label="Back to top"
     >
       ↑

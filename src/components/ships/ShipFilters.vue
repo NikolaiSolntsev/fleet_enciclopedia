@@ -12,41 +12,22 @@
 
       <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('nation') || 'Nation'}}</label>
-        <select v-model="store.selectedNation">
-          <option :value="null">{{t('all_nation') || 'All nations'}}</option>
-          <option v-for="(nation, key) in store.nations" :key="key" :value="key">
-            {{ nation.title }}
-          </option>
-        </select>
+        <CustomSelect v-model="store.selectedNation" :options="nationOptions" />
       </div>
 
       <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('class') || 'class'}}</label>
-        <select v-model="store.selectedType">
-          <option :value="null">{{t('all_classes') || 'All Classes'}}</option>
-          <option v-for="(type, key) in store.types" :key="key" :value="key">
-            {{ type.title }}
-          </option>
-        </select>
+        <CustomSelect v-model="store.selectedType" :options="typeOptions" :icon-size="32" />
       </div>
 
       <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('tier') || 'tier'}}</label>
-        <select v-model="store.selectedTier">
-          <option :value="null">{{t('all_tiers') || 'All tiers'}}</option>
-          <option v-for="tier in 11" :key="tier" :value="tier">
-            {{t('tier') || 'Tier'}} {{ toRomanTier(tier) }}
-          </option>
-        </select>
+        <CustomSelect v-model="store.selectedTier" :options="tierOptions" />
       </div>
 
       <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('sort_by') || 'sort by'}}</label>
-        <select v-model="store.sortBy">
-          <option value="level-desc">{{t('sort_level_desc') || 'Tier (High to Low)'}}</option>
-          <option value="level-asc">{{t('sort_level_asc') || 'Tier (Low to High)'}}</option>
-          <option value="title">{{t('sort_by_name') || 'Name (A-Z)'}}</option>
-        </select>
+        <CustomSelect v-model="store.sortBy" :options="sortOptions" />
       </div>
     </div>
 
@@ -64,7 +45,7 @@
             :class="{ 'is-active': store.viewMode === 'list' }"
             :aria-pressed="store.viewMode === 'list'"
             :aria-label="t('view_list', 'List view')"
-            :title="t('view_list', 'List view')"
+            :data-tooltip="t('view_list', 'List view')"
             @click="store.viewMode = 'list'"
           >
             <ListIcon size="18" />
@@ -76,7 +57,8 @@
             :class="{ 'is-active': store.viewMode === 'grid' }"
             :aria-pressed="store.viewMode === 'grid'"
             :aria-label="t('view_grid', 'Grid view')"
-            :title="t('view_grid', 'Grid view')"
+            :data-tooltip="t('view_grid', 'Grid view')"
+            data-tooltip-align="right"
             @click="store.viewMode = 'grid'"
           >
             <GridIcon size="18" />
@@ -107,17 +89,50 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useShipsStore } from '@/store/useShipsStore';
 import { toRomanTier } from '@/utils/toRomanTier';
 import { useTranslation } from 'i18next-vue';
 import ListIcon from '../ui/BaseListIcon.vue';
 import GridIcon from '../ui/BaseGridIcon.vue';
+import CustomSelect from '../ui/CustomSelect.vue';
 
 const store = useShipsStore();
 const { t } = useTranslation();
 
 const showMoreFilters = ref(false);
+
+const nationOptions = computed(() => [
+  { value: null, label: t('all_nation') || 'All nations' },
+  ...Object.entries(store.nations).map(([key, nation]) => ({
+    value: key,
+    label: nation.title,
+    icon: nation.icons?.tiny
+  }))
+]);
+
+const typeOptions = computed(() => [
+  { value: null, label: t('all_classes') || 'All Classes' },
+  ...Object.entries(store.types).map(([key, type]) => ({
+    value: key,
+    label: type.title,
+    icon: type.icons?.normal
+  }))
+]);
+
+const tierOptions = computed(() => [
+  { value: null, label: t('all_tiers') || 'All tiers' },
+  ...Array.from({ length: 11 }, (_, index) => ({
+    value: index + 1,
+    label: `${t('tier') || 'Tier'} ${toRomanTier(index + 1)}`
+  }))
+]);
+
+const sortOptions = computed(() => [
+  { value: 'level-desc' as const, label: t('sort_level_desc') || 'Tier (High to Low)' },
+  { value: 'level-asc' as const, label: t('sort_level_asc') || 'Tier (Low to High)' },
+  { value: 'title' as const, label: t('sort_by_name') || 'Name (A-Z)' }
+]);
 </script>
 
 <style lang="scss" scoped>

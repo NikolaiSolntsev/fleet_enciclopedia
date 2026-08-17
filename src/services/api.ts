@@ -24,6 +24,16 @@ interface MediaPathResponse {
 let mediaPathCache: string | null = null;
 let languagesCache: string[] = [];
 
+function withMediaPath(icons: Record<string, any> | undefined, mediaPath: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  Object.entries(icons || {}).forEach(([key, path]) => {
+    if (typeof path === 'string' && path) {
+      result[key] = `${mediaPath}${path}`;
+    }
+  });
+  return result;
+}
+
 async function getMediaPath(): Promise<string> {
   if (mediaPathCache) return mediaPathCache;
   try {
@@ -65,7 +75,7 @@ export async function fetchShipsData() {
         name: nation.name || key,
         color: nation.color || 0,
         localization: nation.localization,
-        icons: nation.icons || {}
+        icons: withMediaPath(nation.icons, mediaPath)
       };
     });
   }
@@ -76,7 +86,7 @@ export async function fetchShipsData() {
       typesRecord[key] = {
         name: key,
         localization: type.localization,
-        icons: type.icons
+        icons: withMediaPath(type.icons, mediaPath)
       };
     });
   }
@@ -86,11 +96,7 @@ export async function fetchShipsData() {
     const tags = vehicle.tags || [];
     const shipType = tags.find((tag: string) => Object.keys(typesRecord).includes(tag)) || 'Unknown';
 
-    const icons = vehicle.icons || {};
-    const fullIcons: Record<string, string> = {};
-    Object.entries(icons).forEach(([key, path]: [string, any]) => {
-      fullIcons[key] = `${mediaPath}${path}`;
-    });
+    const fullIcons = withMediaPath(vehicle.icons, mediaPath);
 
     ships.push({
       id: parseInt(id) || id,
@@ -99,7 +105,8 @@ export async function fetchShipsData() {
       nation: extractNationFromName(vehicle.name, Object.keys(nationsRecord)),
       type: shipType,
       is_premium: tags.includes('uiPremium') || false,
-      is_special: tags.includes('special') || false,
+      is_special: tags.includes('special') || tags.includes('uiSpecial') || false,
+      tags,
       icons: fullIcons,
       localization: {
         shortmark: vehicle.localization?.shortmark || {},

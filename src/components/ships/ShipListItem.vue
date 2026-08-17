@@ -10,8 +10,24 @@
       </h3>
 
       <span class="item-meta">
-        <span class="ship-nation">{{ nationTitle }}</span>
-        <span class="ship-type">{{ typeTitle }}</span>
+        <span class="ship-nation">
+          <img
+            v-if="nationFlag"
+            :src="nationFlag"
+            :alt="nationTitle"
+            class="meta-icon flag-icon"
+            loading="lazy"
+          />{{ nationTitle }}
+        </span>
+        <span class="ship-type">
+          <img
+            v-if="typeIcon"
+            :src="typeIcon"
+            :alt="typeTitle"
+            class="meta-icon type-icon"
+            loading="lazy"
+          />{{ typeTitle }}
+        </span>
       </span>
     </div>
 
@@ -23,7 +39,8 @@
       <span
         v-if="ship.is_premium"
         class="premium-badge"
-        :title="t('premium') || 'PREMIUM'"
+        :data-tooltip="t('premium') || 'PREMIUM'"
+        data-tooltip-align="right"
       >★</span>
     </div>
   </div>
@@ -41,6 +58,8 @@ const store = useShipsStore();
 
 const nationTitle = computed(() => store.nations[props.ship.nation]?.title || props.ship.nation);
 const typeTitle = computed(() => store.types[props.ship.type]?.title || props.ship.type);
+const nationFlag = computed(() => store.nations[props.ship.nation]?.icons?.tiny || '');
+const typeIcon = computed(() => store.types[props.ship.type]?.icons?.normal || '');
 const { t } = useTranslation();
 </script>
 
@@ -156,6 +175,24 @@ const { t } = useTranslation();
     text-overflow: ellipsis;
     flex: 0 1 auto;
     min-width: 0;
+  }
+
+  .meta-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.35rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .flag-icon {
+    height: 24px;
+    width: auto;
+  }
+
+  .type-icon {
+    height: 36px;
+    width: auto;
+    opacity: 0.85;
   }
 
   .tier-badge {

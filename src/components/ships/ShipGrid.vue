@@ -53,7 +53,7 @@ const statsRef = ref<HTMLElement>();
 
 const STATS_MARGIN_BOTTOM = 32;
 
-const LOAD_MORE_DELAY = 800;
+const LOAD_MORE_DELAY = 200;
 
 let intersectionObserver: IntersectionObserver | null = null;
 let loadMoreTimer: ReturnType<typeof setTimeout> | null = null;

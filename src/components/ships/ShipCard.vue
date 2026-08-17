@@ -4,7 +4,10 @@
     class="ship-card"
     :class="{ 'is-premium': ship.is_premium }"
   >
-    <div class="card-media">
+    <div
+      class="card-media"
+      :style="nationFlag ? { '--nation-flag': `url(${nationFlag})` } : undefined"
+    >
       <img
         :src="ship.icons.medium || ship.icons.small || ship.icons.default"
         :alt="ship.title"
@@ -46,6 +49,7 @@ const store = useShipsStore();
 
 const nationTitle = computed(() => store.nations[props.ship.nation]?.title || props.ship.nation);
 const typeTitle = computed(() => store.types[props.ship.type]?.title || props.ship.type);
+const nationFlag = computed(() => store.nations[props.ship.nation]?.icons?.small || '');
 const { t } = useTranslation();
 </script>
 
@@ -96,8 +100,9 @@ const { t } = useTranslation();
     }
 
     .tier-badge {
-      background-color: $color-gold;
+      background: $color-gold;
       color: $color-dark;
+      border-color: $color-gold;
     }
   }
 
@@ -112,6 +117,18 @@ const { t } = useTranslation();
 
     @media (min-width: 640px) {
       height: 160px;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-image: var(--nation-flag, none);
+      background-size: cover;
+      background-position: center;
+      opacity: 0.35;
+      pointer-events: none;
     }
 
     img {
@@ -131,9 +148,13 @@ const { t } = useTranslation();
       font-size: 0.85rem;
       padding: 0.15rem 0.5rem;
       border-radius: $radius-sm;
-      background-color: rgba($color-dark, 0.85);
+      background: linear-gradient(
+        90deg,
+        rgba($color-panel, 0.75) 0%,
+        rgba($color-emerald, 0.75) 100%
+      );
       color: $color-accent;
-      border: 1px solid $color-border;
+      border: 1px solid $color-accent;
     }
 
     .premium-badge {

@@ -48,7 +48,7 @@ export const useShipsStore = defineStore('ships', () => {
   const selectedType = ref<string | null>(null);
   const selectedTier = ref<number | null>(null);
   const isPremiumOnly = ref(false);
-  const sortBy = ref<'level-desc' | 'level-asc' | 'title'>('level-desc');
+  const sortBy = ref<'level-desc' | 'level-asc' | 'title'>('level-asc');
   const selectedShip = ref<Ship | null>(null);
   const viewMode = ref<'grid' | 'list'>('grid');
 
@@ -114,7 +114,7 @@ export const useShipsStore = defineStore('ships', () => {
     selectedType.value = null;
     selectedTier.value = null;
     isPremiumOnly.value = false;
-    sortBy.value = 'level-desc';
+    sortBy.value = 'level-asc';
     currentPage.value = 1;
   }
 

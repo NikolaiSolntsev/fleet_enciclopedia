@@ -27,6 +27,7 @@ export interface RawShip {
   type: string;
   is_premium: boolean;
   is_special: boolean;
+  tags: string[];
   icons: Record<string, string>;
   localization?: {
     shortmark?: Record<string, string>;
