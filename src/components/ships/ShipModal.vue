@@ -31,10 +31,10 @@
             <h4>{{ t('overview') || 'Overview' }}</h4>
             <p>{{ ship.description || 'No detailed historical description available for this vehicle.' }}</p>
           </div>
+        </div>
 
-          <div class="modal-actions">
-            <button @click="close" class="btn-close">{{ t('close') || "Close" }}</button>
-          </div>
+        <div class="modal-actions">
+          <button @click="close" class="btn-close">{{ t('close') || "Close" }}</button>
         </div>
 
       </div>
@@ -85,6 +85,9 @@ function close() {
   position: relative;
   width: 100%;
   max-width: 640px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: $color-panel;
   border: 1px solid $color-accent;
   border-radius: $radius-lg;
@@ -105,7 +108,8 @@ function close() {
 
   .modal-media {
     position: relative;
-    height: 256px;
+    flex: none;
+    height: clamp(140px, 30vh, 256px);
     background: linear-gradient(180deg, $color-dark 0%, $color-panel 100%);
     padding: 1.5rem;
     display: flex;
@@ -171,16 +175,23 @@ function close() {
   }
 
   .modal-body {
-    padding: 1.5rem;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    padding:0 1.5rem;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     gap: 1rem;
 
     .ship-header {
+      flex: none;
+
       .title {
         font-size: 1.5rem;
         font-weight: 900;
         color: #fff;
+        margin: 0.5rem 0;
       }
 
       .meta {
@@ -188,15 +199,21 @@ function close() {
         color: $color-muted;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-top: 0.1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
       }
     }
 
     .ship-description {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
       border-top: 1px solid $color-border;
-      padding-top: 1rem;
+      padding-top: 0.5rem;
 
       h4 {
+        flex: none;
         font-size: 0.75rem;
         text-transform: uppercase;
         color: $color-muted;
@@ -205,11 +222,12 @@ function close() {
       }
 
       p {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
         font-size: 0.875rem;
         color: $color-text;
         line-height: 1.6;
-        max-height: 160px;
-        overflow-y: auto;
         padding-right: 0.5rem;
         scrollbar-width: none;
         -ms-overflow-style: none;
@@ -219,27 +237,28 @@ function close() {
         }
       }
     }
+  }
 
-    .modal-actions {
-      border-top: 1px solid $color-border;
-      padding-top: 1rem;
-      display: flex;
-      justify-content: flex-end;
+  .modal-actions {
+    flex: none;
+    border-top: 1px solid $color-border;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
 
-      .btn-close {
-        padding: 0.5rem 1.25rem;
-        background-color: $color-card;
-        color: #fff;
-        border: 1px solid $color-border;
-        border-radius: $radius-sm;
-        font-weight: bold;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: $transition-default;
+    .btn-close {
+      padding: 0.5rem 1.25rem;
+      background-color: $color-card;
+      color: #fff;
+      border: 1px solid $color-border;
+      border-radius: $radius-sm;
+      font-weight: bold;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: $transition-default;
 
-        &:hover {
-          background-color: $color-border;
-        }
+      &:hover {
+        background-color: $color-border;
       }
     }
   }
