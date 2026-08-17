@@ -10,7 +10,7 @@
         />
       </div>
 
-      <div class="filter-group">
+      <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('nation') || 'Nation'}}</label>
         <select v-model="store.selectedNation">
           <option :value="null">{{t('all_nation') || 'All nations'}}</option>
@@ -20,7 +20,7 @@
         </select>
       </div>
 
-      <div class="filter-group">
+      <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('class') || 'class'}}</label>
         <select v-model="store.selectedType">
           <option :value="null">{{t('all_classes') || 'All Classes'}}</option>
@@ -30,7 +30,7 @@
         </select>
       </div>
 
-      <div class="filter-group">
+      <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('tier') || 'tier'}}</label>
         <select v-model="store.selectedTier">
           <option :value="null">{{t('all_tiers') || 'All tiers'}}</option>
@@ -40,7 +40,7 @@
         </select>
       </div>
 
-      <div class="filter-group">
+      <div class="filter-group collapsible" :class="{ 'is-open': showMoreFilters }">
         <label>{{t('sort_by') || 'sort by'}}</label>
         <select v-model="store.sortBy">
           <option value="level-desc">{{t('sort_level_desc') || 'Tier (High to Low)'}}</option>
@@ -56,20 +56,38 @@
         <span>{{t('premium_only') || 'Premiun & Special Only'}}</span>
       </label>
 
-      <button @click="store.resetFilters" class="reset-btn">
-        {{ t('reset_filters') || 'reset filters'}}
-      </button>
+      <div class="footer-actions">
+        <button
+          @click="showMoreFilters = !showMoreFilters"
+          class="reset-btn more-filters-btn"
+        >
+          {{ showMoreFilters
+            ? t('less_filters', 'Less filters')
+            : t('more_filters', 'More filters') }}
+        </button>
+
+        <button
+          @click="store.resetFilters"
+          class="reset-btn"
+          :class="{ 'is-open': showMoreFilters }"
+        >
+          {{ t('reset_filters') || 'reset filters'}}
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useShipsStore } from '@/store/useShipsStore';
 import { toRomanTier } from '@/utils/toRomanTier';
 import { useTranslation } from 'i18next-vue';
 
 const store = useShipsStore();
 const { t } = useTranslation();
+
+const showMoreFilters = ref(false);
 </script>
 
 <style lang="scss" scoped>
@@ -95,6 +113,16 @@ const { t } = useTranslation();
     grid-template-columns: 1fr;
     gap: 0.75rem;
     margin-bottom: 1rem;
+
+    @media (max-width: 639px) {
+      .collapsible {
+        display: none;
+
+        &.is-open {
+          display: flex;
+        }
+      }
+    }
 
     @media (min-width: 480px) {
       grid-template-columns: repeat(2, 1fr);
@@ -178,6 +206,12 @@ const { t } = useTranslation();
       }
     }
 
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
     .reset-btn {
       background: none;
       border: none;
@@ -188,9 +222,28 @@ const { t } = useTranslation();
       text-decoration: underline;
       cursor: pointer;
       transition: $transition-default;
+      white-space: nowrap;
 
       &:hover {
         color: #fff;
+      }
+    }
+
+    .more-filters-btn {
+      display: none;
+    }
+
+    @media (max-width: 639px) {
+      .more-filters-btn {
+        display: inline-block;
+      }
+
+      .reset-btn:not(.more-filters-btn) {
+        display: none;
+
+        &.is-open {
+          display: inline-block;
+        }
       }
     }
   }

@@ -22,17 +22,13 @@
     </div>
 
     <div class="card-info">
-      <div>
+      <div class="card-text">
         <h3 class="ship-title">
           {{ ship.title }}
         </h3>
         <p class="ship-meta">
           {{ nationTitle }} • {{ typeTitle }}
         </p>
-      </div>
-
-      <div class="card-action">
-        <span>{{t('view_details') || 'View details →'}} </span>
       </div>
     </div>
   </div>
@@ -77,10 +73,6 @@ const { t } = useTranslation();
 
     .card-media img {
       transform: scale(1.08);
-    }
-
-    .card-action span {
-      opacity: 1;
     }
 
     .ship-title {
@@ -166,7 +158,10 @@ const { t } = useTranslation();
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+
+    @media (max-width: 639px) {
+      padding: 0.6rem 0.75rem;
+    }
 
     .ship-title {
       font-weight: bold;
@@ -184,21 +179,29 @@ const { t } = useTranslation();
       margin-top: 0.25rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .card-action {
-      margin-top: 1rem;
-      padding-top: 0.5rem;
-      border-top: 1px solid rgba($color-border, 0.3);
-      display: flex;
-      justify-content: flex-end;
+    @media (max-width: 639px) {
+      .card-text {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.4rem;
+        padding-inline: 0.5rem;
+      }
 
-      span {
-        font-size: 0.75rem;
-        color: $color-accent;
-        font-weight: bold;
-        opacity: 0;
-        transition: $transition-default;
+      .ship-title {
+        flex: 0 1 auto;
+        min-width: 0;
+      }
+
+      .ship-meta {
+        flex: 0 1 auto;
+        min-width: 0;
+        margin-top: 0;
       }
     }
   }

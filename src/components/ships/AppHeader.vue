@@ -2,14 +2,14 @@
   <header class="app-header">
     <div class="header-container">
       <div class="brand">
-        <!-- <div class=""> -->
+    
         <div class="logo">
           <AnchorIcon color="white"/>
         </div>
         <h1 class="title">
-          World of Warships 
+          World of Warships
         </h1>
-        <!-- </div> -->
+      
         <h2 class="name">{{t('header_title') || 'fleet encyclopedia'}}</h2>
       </div>
 
@@ -52,25 +52,18 @@ const store = useShipsStore();
     max-width: 1280px;
     margin: 0 auto;
     display: flex;
-    flex-direction: column;
+    flex-flow: row wrap;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 0.75rem;
-
-    // @media (min-width: 640px) {
-    //   gap: 1rem;
-    // }
-
-    @media (min-width: 768px) {
-      flex-direction: row;
-    }
   }
 
   .brand {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 0.75rem;
+    flex: 1 0 auto;
 
     .logo {
       width: 2.5rem;
@@ -84,11 +77,15 @@ const store = useShipsStore();
       font-weight: bold;
       font-size: 1.2rem;
       box-shadow: 0 0 10px rgba($color-accent, 0.4);
+      
+      @media (max-width: 639px){
+        margin-bottom: 0.5rem;
+      }
     }
 
     .title {
       font-size: 1.1rem;
-      word-wrap: none;
+      white-space: nowrap;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -143,12 +140,12 @@ const store = useShipsStore();
 
     }
 
-    @media (max-width: 640px)
+    @media (max-width: 639px)
     {
       flex-direction: column;
       gap: 0.1rem;
 
-      .name, title {
+      .name, .title {
         margin: 0.1rem;
       } 
     }
@@ -158,6 +155,7 @@ const store = useShipsStore();
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex: 0 0 auto;
   }
 
   .stats {
