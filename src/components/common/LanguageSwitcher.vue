@@ -1,5 +1,5 @@
 <template>
-  <div class="language-switcher">
+  <div ref="rootRef" class="language-switcher">
     <button
       class="globe-btn"
       @click="isOpen = !isOpen"
@@ -26,14 +26,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useShipsStore } from '@/store/useShipsStore';
 import  GlobalIcon from '../ui/BaseGlobalIcon.vue';
 import { useTranslation } from 'i18next-vue';
 
 const store = useShipsStore();
+const rootRef = ref<HTMLElement>();
 const isOpen = ref(false);
 const { t, i18next} = useTranslation();
+
+function onDocumentClick(event: MouseEvent) {
+  if (!isOpen.value) return;
+  if (rootRef.value?.contains(event.target as Node)) return;
+  isOpen.value = false;
+}
+
+onMounted(() => document.addEventListener('click', onDocumentClick));
+onUnmounted(() => document.removeEventListener('click', onDocumentClick));
 
 const languageNames: Record<string, string> = {
   en: 'English',
