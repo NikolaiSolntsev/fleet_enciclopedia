@@ -20,8 +20,12 @@
     </div>
 
     <div v-else>
-      <div class="grid-layout">
+      <div v-if="store.viewMode === 'grid'" class="grid-layout">
         <ShipCard v-for="ship in store.filteredShips" :key="ship.id" :ship="ship" />
+      </div>
+
+      <div v-else class="list-layout">
+        <ShipListItem v-for="ship in store.filteredShips" :key="ship.id" :ship="ship" />
       </div>
 
       <div
@@ -38,6 +42,7 @@
 <script setup lang="ts">
 import { useShipsStore } from '@/store/useShipsStore';
 import ShipCard from './ShipCard.vue';
+import ShipListItem from './ShipListItem.vue';
 import ShipCardSkeleton from './ShipCardSkeleton.vue';
 import { onUnmounted, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
@@ -48,15 +53,30 @@ const statsRef = ref<HTMLElement>();
 
 const STATS_MARGIN_BOTTOM = 32;
 
-let intersectionObserver: IntersectionObserver | null = null;
+const LOAD_MORE_DELAY = 800;
 
+let intersectionObserver: IntersectionObserver | null = null;
+let loadMoreTimer: ReturnType<typeof setTimeout> | null = null;
+
+function cancelPendingLoad() {
+  if (loadMoreTimer === null) return;
+  clearTimeout(loadMoreTimer);
+  loadMoreTimer = null;
+}
 
 function observeStats(el: HTMLElement) {
   intersectionObserver = new IntersectionObserver(
     (entries) => {
-      if (!entries[0].isIntersecting) return;
-      if (!store.hasMore) return;
-      store.loadMore();
+      if (!entries[0].isIntersecting) {
+        cancelPendingLoad();
+        return;
+      }
+      if (!store.hasMore || loadMoreTimer !== null) return;
+
+      loadMoreTimer = setTimeout(() => {
+        loadMoreTimer = null;
+        if (store.hasMore) store.loadMore();
+      }, LOAD_MORE_DELAY);
     },
     {
       threshold: 1,
@@ -70,11 +90,13 @@ function observeStats(el: HTMLElement) {
 watch(statsRef, (el) => {
   intersectionObserver?.disconnect();
   intersectionObserver = null;
+  cancelPendingLoad();
   if (el) observeStats(el);
 });
 
 onUnmounted(() => {
   intersectionObserver?.disconnect();
+  cancelPendingLoad();
 });
 </script>
 
@@ -94,6 +116,16 @@ onUnmounted(() => {
   }
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.list-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  @media (min-width: 768px) {
+    gap: 1rem;
   }
 }
 

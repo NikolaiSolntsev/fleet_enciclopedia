@@ -51,10 +51,38 @@
     </div>
 
     <div class="filters-footer">
-      <label class="checkbox-label">
-        <input v-model="store.isPremiumOnly" type="checkbox" />
-        <span>{{t('premium_only') || 'Premiun & Special Only'}}</span>
-      </label>
+      <div class="footer-main">
+        <label class="checkbox-label">
+          <input v-model="store.isPremiumOnly" type="checkbox" />
+          <span>{{t('premium_only') || 'Premiun & Special Only'}}</span>
+        </label>
+
+        <div class="view-toggle">
+          <button
+            type="button"
+            class="view-btn"
+            :class="{ 'is-active': store.viewMode === 'list' }"
+            :aria-pressed="store.viewMode === 'list'"
+            :aria-label="t('view_list', 'List view')"
+            :title="t('view_list', 'List view')"
+            @click="store.viewMode = 'list'"
+          >
+            <ListIcon size="18" />
+          </button>
+
+          <button
+            type="button"
+            class="view-btn"
+            :class="{ 'is-active': store.viewMode === 'grid' }"
+            :aria-pressed="store.viewMode === 'grid'"
+            :aria-label="t('view_grid', 'Grid view')"
+            :title="t('view_grid', 'Grid view')"
+            @click="store.viewMode = 'grid'"
+          >
+            <GridIcon size="18" />
+          </button>
+        </div>
+      </div>
 
       <div class="footer-actions">
         <button
@@ -83,6 +111,8 @@ import { ref } from 'vue';
 import { useShipsStore } from '@/store/useShipsStore';
 import { toRomanTier } from '@/utils/toRomanTier';
 import { useTranslation } from 'i18next-vue';
+import ListIcon from '../ui/BaseListIcon.vue';
+import GridIcon from '../ui/BaseGridIcon.vue';
 
 const store = useShipsStore();
 const { t } = useTranslation();
@@ -186,6 +216,47 @@ const showMoreFilters = ref(false);
     padding-top: 1rem;
     gap: 1rem;
 
+    .footer-main {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      @media (max-width: 639px) {
+        flex: 1 0 100%;
+        justify-content: space-between;
+      }
+    }
+
+    .view-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .view-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem;
+      background: none;
+      border: none;
+      border-radius: $radius-sm;
+      color: $color-muted;
+      cursor: pointer;
+      transition: $transition-default;
+
+      &:hover {
+        color: #fff;
+        font-weight: bold;
+       
+      }
+
+      &.is-active {
+        color:$color-gold;
+        font-weight: bold;
+      }
+    }
+
     .checkbox-label {
       display: flex;
       align-items: center;
@@ -234,6 +305,10 @@ const showMoreFilters = ref(false);
     }
 
     @media (max-width: 639px) {
+      .footer-actions {
+        margin-left: auto;
+      }
+
       .more-filters-btn {
         display: inline-block;
       }

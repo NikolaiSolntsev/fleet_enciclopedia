@@ -50,8 +50,9 @@ export const useShipsStore = defineStore('ships', () => {
   const isPremiumOnly = ref(false);
   const sortBy = ref<'level-desc' | 'level-asc' | 'title'>('level-desc');
   const selectedShip = ref<Ship | null>(null);
+  const viewMode = ref<'grid' | 'list'>('grid');
 
-  // Переведённые данные в зависимости от языка
+
   const nations = computed<Record<string, Nation>>(() => {
     const result: Record<string, Nation> = {};
     Object.entries(rawNations.value).forEach(([key, nation]) => {
@@ -169,6 +170,7 @@ export const useShipsStore = defineStore('ships', () => {
     isPremiumOnly,
     sortBy,
     selectedShip,
+    viewMode,
     currentLanguage,
     availableLanguages,
     currentPage,

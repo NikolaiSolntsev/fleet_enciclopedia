@@ -18,6 +18,8 @@
         "reset_filters":"reset filters",
         "more_filters":"more filters",
         "less_filters":"less filters",
+        "view_grid":"Grid view",
+        "view_list":"List view",
         "overview":"Overview",
         "close":"Close",
         "load_more":"Load More Ships",
