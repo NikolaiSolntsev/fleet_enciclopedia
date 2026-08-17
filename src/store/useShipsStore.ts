@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { fetchShipsData } from '../services/api';
-import type { Ship, Nation, VehicleType } from '../types/shipTypes';
+import type { RawShip, RawNation, RawVehicleType, Ship, Nation, VehicleType } from '../types/shipTypes';
 
 const LANG_STORAGE_KEY = 'wow-catalog-lang';
 const DEFAULT_LANG = 'en';
@@ -20,10 +20,22 @@ function saveLanguage(lang: string): void {
   }
 }
 
+function getLocalizedTitle(localization: any, lang: string, fallback: string): string {
+  return localization?.mark?.[lang] || localization?.mark?.en || fallback;
+}
+
+function getLocalizedShipTitle(localization: any, lang: string, fallback: string): string {
+  return localization?.shortmark?.[lang] || localization?.shortmark?.en || fallback;
+}
+
+function getLocalizedShipDescription(localization: any, lang: string): string {
+  return localization?.description?.[lang] || localization?.description?.en || '';
+}
+
 export const useShipsStore = defineStore('ships', () => {
-  const ships = ref<Ship[]>([]);
-  const nations = ref<Record<string, Nation>>({});
-  const types = ref<Record<string, VehicleType>>({});
+  const rawShips = ref<RawShip[]>([]);
+  const rawNations = ref<Record<string, RawNation>>({});
+  const rawTypes = ref<Record<string, RawVehicleType>>({});
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const currentLanguage = ref<string>(getSavedLanguage());
@@ -40,15 +52,46 @@ export const useShipsStore = defineStore('ships', () => {
   const sortBy = ref<'level-desc' | 'level-asc' | 'title'>('level-desc');
   const selectedShip = ref<Ship | null>(null);
 
+  // Переведённые данные в зависимости от языка
+  const nations = computed<Record<string, Nation>>(() => {
+    const result: Record<string, Nation> = {};
+    Object.entries(rawNations.value).forEach(([key, nation]) => {
+      result[key] = {
+        ...nation,
+        title: getLocalizedTitle(nation.localization, currentLanguage.value, nation.name || key)
+      };
+    });
+    return result;
+  });
+
+  const types = computed<Record<string, VehicleType>>(() => {
+    const result: Record<string, VehicleType> = {};
+    Object.entries(rawTypes.value).forEach(([key, type]) => {
+      result[key] = {
+        ...type,
+        title: getLocalizedTitle(type.localization, currentLanguage.value, key)
+      };
+    });
+    return result;
+  });
+
+  const ships = computed<Ship[]>(() => {
+    return rawShips.value.map(ship => ({
+      ...ship,
+      title: getLocalizedShipTitle(ship.localization, currentLanguage.value, ship.name),
+      description: getLocalizedShipDescription(ship.localization, currentLanguage.value)
+    }));
+  });
+
   async function loadData() {
     isLoading.value = true;
     error.value = null;
     currentPage.value = 1;
     try {
-      const data = await fetchShipsData(currentLanguage.value);
-      ships.value = data.ships;
-      nations.value = data.nations;
-      types.value = data.types;
+      const data = await fetchShipsData();
+      rawShips.value = data.ships;
+      rawNations.value = data.nations;
+      rawTypes.value = data.types;
       if (data.languages) {
         availableLanguages.value = data.languages;
       }
@@ -63,7 +106,6 @@ export const useShipsStore = defineStore('ships', () => {
   function setLanguage(lang: string) {
     currentLanguage.value = lang;
     saveLanguage(lang);
-    loadData();
   }
 
   function resetFilters() {

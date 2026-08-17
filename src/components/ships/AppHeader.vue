@@ -2,12 +2,15 @@
   <header class="app-header">
     <div class="header-container">
       <div class="brand">
+        <!-- <div class=""> -->
         <div class="logo">
           <AnchorIcon color="white"/>
         </div>
         <h1 class="title">
-          World of Warships <span>{{t('header_title') || 'fleet encyclopedia'}}</span>
+          World of Warships 
         </h1>
+        <!-- </div> -->
+        <h2 class="name">{{t('header_title') || 'fleet encyclopedia'}}</h2>
       </div>
 
       <div class="header-right">
@@ -54,9 +57,9 @@ const store = useShipsStore();
     justify-content: space-between;
     gap: 0.75rem;
 
-    @media (min-width: 640px) {
-      gap: 1rem;
-    }
+    // @media (min-width: 640px) {
+    //   gap: 1rem;
+    // }
 
     @media (min-width: 768px) {
       flex-direction: row;
@@ -66,6 +69,7 @@ const store = useShipsStore();
   .brand {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 0.75rem;
 
     .logo {
@@ -84,6 +88,7 @@ const store = useShipsStore();
 
     .title {
       font-size: 1.1rem;
+      word-wrap: none;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -110,10 +115,12 @@ const store = useShipsStore();
       @media (min-width: 1024px) {
         font-size: 2rem;
       }
-
-      span {
-        font-size: 0.6em;
+    }
+ 
+    .name {
+        font-size: 1.1rem;
         font-weight: 600;
+        line-height: 1.1;
         color: $color-accent;
         display: block;
         letter-spacing: 0.5px;
@@ -121,17 +128,29 @@ const store = useShipsStore();
         text-transform: uppercase;
 
         @media (min-width: 480px) {
-          font-size: 0.65em;
-          letter-spacing: 0.7px;
+        font-size: 1.3rem;
+        letter-spacing: 1.5px;
         }
 
         @media (min-width: 640px) {
-          font-size: 0.7em;
-          display: inline;
-          margin-left: 0.5rem;
-          letter-spacing: 1px;
+          font-size: 1.6rem;
+          letter-spacing: 2px;
         }
-      }
+
+        @media (min-width: 1024px) {
+          font-size: 2rem;
+        }
+
+    }
+
+    @media (max-width: 640px)
+    {
+      flex-direction: column;
+      gap: 0.1rem;
+
+      .name, title {
+        margin: 0.1rem;
+      } 
     }
   }
 

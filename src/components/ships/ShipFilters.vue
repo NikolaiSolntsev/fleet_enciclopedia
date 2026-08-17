@@ -6,7 +6,7 @@
         <input
           v-model="store.searchQuery"
           type="text"
-          placeholder="Ship name..."
+          :placeholder="t('ship_name', 'Ship name...')"
         />
       </div>
 
@@ -121,7 +121,6 @@ const { t } = useTranslation();
     }
 
     input, select {
-      width: 100%;
       background-color: $color-panel;
       border: 2px solid #3a7f8f;
       border-radius: $radius-sm;

@@ -112,19 +112,11 @@ onMounted(() => {
 .main-content {
   flex-grow: 1;
   max-width: 1280px;
-  width: 100%;
+  overflow-x: auto;
   margin: 0 auto;
   padding: 1rem 0.75rem;
   position: relative;
   z-index: 1;
-
-  @media (min-width: 480px) {
-    padding: 1.5rem 1rem;
-  }
-
-  @media (min-width: 640px) {
-    padding: 2rem 1.5rem;
-  }
 }
 
 </style>

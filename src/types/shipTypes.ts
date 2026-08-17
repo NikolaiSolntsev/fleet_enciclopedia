@@ -1,42 +1,42 @@
-export interface Nation {
+export interface RawNation {
   name: string;
-  title: string;
   color: number;
-  icons: {
-    small: string;
-    large: string;
-    default: string;
-    tiny?: string;
-    local_small?: string;
-    local_large?: string;
-    local_tiny?: string;
-  };
+  localization?: Record<string, any>;
+  icons: Record<string, string>;
 }
 
-export interface VehicleType {
-  name: string;
+export interface Nation extends RawNation {
   title: string;
+}
+
+export interface RawVehicleType {
+  name: string;
+  localization?: Record<string, any>;
   icons?: Record<string, string>;
 }
 
-export interface Ship {
+export interface VehicleType extends RawVehicleType {
+  title: string;
+}
+
+export interface RawShip {
   id: number | string;
   name: string;
-  title: string;
-  description: string;
   level: number;
   nation: string;
   type: string;
   is_premium: boolean;
   is_special: boolean;
-  icons: {
-    small?: string;
-    medium?: string;
-    large?: string;
-    contour?: string;
-    default?: string;
-    [key: string]: string | undefined;
+  icons: Record<string, string>;
+  localization?: {
+    shortmark?: Record<string, string>;
+    description?: Record<string, string>;
   };
+}
+
+export interface Ship extends RawShip {
+  title: string;
+  description: string;
 }
 
 export interface ApiResponse<T> {

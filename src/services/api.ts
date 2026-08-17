@@ -1,4 +1,4 @@
-import type { Ship, Nation, VehicleType } from '../types/shipTypes';
+import type { RawShip, RawNation, RawVehicleType } from '../types/shipTypes';
 
 const BASE_URL = '/api-wows/api/encyclopedia/en';
 
@@ -39,7 +39,7 @@ async function getMediaPath(): Promise<string> {
   return 'https://wows-gloss-icons.wgcdn.co/icons/';
 }
 
-export async function fetchShipsData(lang: string = 'en') {
+export async function fetchShipsData() {
   const [baseRes, vehiclesRes] = await Promise.all([
     fetch(`${BASE_URL}/`),
     fetch(`${BASE_URL}/vehicles/`)
@@ -58,28 +58,30 @@ export async function fetchShipsData(lang: string = 'en') {
 
   const mediaPath = await getMediaPath();
 
-  const nationsRecord: Record<string, Nation> = {};
+  const nationsRecord: Record<string, RawNation> = {};
   if (baseData.data.nations) {
     Object.entries(baseData.data.nations).forEach(([key, nation]: [string, any]) => {
       nationsRecord[key] = {
-        ...nation,
-        title: nation.localization?.mark?.[lang] || nation.localization?.mark?.en || nation.name || key
+        name: nation.name || key,
+        color: nation.color || 0,
+        localization: nation.localization,
+        icons: nation.icons || {}
       };
     });
   }
 
-  const typesRecord: Record<string, VehicleType> = {};
+  const typesRecord: Record<string, RawVehicleType> = {};
   if (baseData.data.vehicle_types_common) {
     Object.entries(baseData.data.vehicle_types_common).forEach(([key, type]: [string, any]) => {
       typesRecord[key] = {
-        ...type,
-        title: type.localization?.mark?.[lang] || type.localization?.mark?.en || type.name || key,
-        name: key
+        name: key,
+        localization: type.localization,
+        icons: type.icons
       };
     });
   }
 
-  const ships: Ship[] = [];
+  const ships: RawShip[] = [];
   Object.entries(vehiclesData.data).forEach(([id, vehicle]: [string, any]) => {
     const tags = vehicle.tags || [];
     const shipType = tags.find((tag: string) => Object.keys(typesRecord).includes(tag)) || 'Unknown';
@@ -93,14 +95,16 @@ export async function fetchShipsData(lang: string = 'en') {
     ships.push({
       id: parseInt(id) || id,
       name: vehicle.name || '',
-      title: vehicle.localization?.shortmark?.[lang] || vehicle.localization?.shortmark?.en || vehicle.name || '',
-      description: vehicle.localization?.description?.[lang] || vehicle.localization?.description?.en || '',
       level: vehicle.level || 0,
       nation: extractNationFromName(vehicle.name, Object.keys(nationsRecord)),
       type: shipType,
       is_premium: tags.includes('uiPremium') || false,
       is_special: tags.includes('special') || false,
-      icons: fullIcons
+      icons: fullIcons,
+      localization: {
+        shortmark: vehicle.localization?.shortmark || {},
+        description: vehicle.localization?.description || {}
+      }
     });
   });
 
