@@ -42,7 +42,6 @@ export const useShipsStore = defineStore('ships', () => {
   const availableLanguages = ref<string[]>([]);
 
   const currentPage = ref(1);
-  const isLoadingMore = ref(false);
 
   const searchQuery = ref('');
   const selectedNation = ref<string | null>(null);
@@ -162,7 +161,6 @@ export const useShipsStore = defineStore('ships', () => {
     nations,
     types,
     isLoading,
-    isLoadingMore,
     error,
     searchQuery,
     selectedNation,

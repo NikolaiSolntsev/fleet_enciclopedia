@@ -25,20 +25,10 @@
       </div>
 
       <div
-        v-if="store.hasMore"
-        ref="loadMoreTrigger"
-        class="load-more-trigger"
+        ref="statsRef"
+        class="grid-stats"
+        :class="{ 'has-more': store.hasMore }"
       >
-        <button v-if="!store.isLoadingMore" @click="store.loadMore" class="load-more-btn">
-          {{ t('load_more') || "Load More Ships" }}
-        </button>
-        <div v-else class="loading-indicator">
-          <span>{{t('loading') || "Loading..."}}"</span>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <div class="grid-stats">
        {{ t('showing') || 'Showing'}} {{ store.filteredShips.length }} {{ t('of') || 'of'}} {{ store.totalFilteredCount }}
       </div>
     </div>
@@ -49,37 +39,42 @@
 import { useShipsStore } from '@/store/useShipsStore';
 import ShipCard from './ShipCard.vue';
 import ShipCardSkeleton from './ShipCardSkeleton.vue';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onUnmounted, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
 
 const store = useShipsStore();
-const loadMoreTrigger = ref<HTMLElement>();
-  const { t } = useTranslation();
+const { t } = useTranslation();
+const statsRef = ref<HTMLElement>();
+
+const STATS_MARGIN_BOTTOM = 32;
 
 let intersectionObserver: IntersectionObserver | null = null;
 
-onMounted(() => {
-  if (!loadMoreTrigger.value) return;
 
-  // Intersection Observer для автоматической загрузки
+function observeStats(el: HTMLElement) {
   intersectionObserver = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && store.hasMore && !store.isLoadingMore) {
-          store.loadMore();
-        }
-      });
+      if (!entries[0].isIntersecting) return;
+      if (!store.hasMore) return;
+      store.loadMore();
     },
-    { threshold: 0.1 }
+    {
+      threshold: 1,
+      rootMargin: `0px 0px -${STATS_MARGIN_BOTTOM}px 0px`
+    }
   );
 
-  intersectionObserver.observe(loadMoreTrigger.value);
+  intersectionObserver.observe(el);
+}
+
+watch(statsRef, (el) => {
+  intersectionObserver?.disconnect();
+  intersectionObserver = null;
+  if (el) observeStats(el);
 });
 
 onUnmounted(() => {
-  if (intersectionObserver) {
-    intersectionObserver.disconnect();
-  }
+  intersectionObserver?.disconnect();
 });
 </script>
 
@@ -169,59 +164,16 @@ onUnmounted(() => {
   }
 }
 
-.load-more-trigger {
-  display: flex;
-  justify-content: center;
-  padding: 2rem 1rem;
-
-  .load-more-btn {
-    padding: 0.75rem 2rem;
-    background-color: $color-accent;
-    color: $color-dark;
-    border: none;
-    border-radius: $radius-md;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-
-    &:hover {
-      background-color: $color-accent-hover;
-      transform: scale(1.05);
-    }
-
-    &:active {
-      transform: scale(0.98);
-    }
-  }
-
-  .loading-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    span {
-      color: $color-accent;
-      font-weight: bold;
-      animation: pulse 1.5s infinite;
-    }
-  }
-}
-
 .grid-stats {
   text-align: center;
   padding: 1rem;
   color: $color-text;
   font-size: 0.875rem;
   margin-top: 1rem;
-}
+  margin-bottom: 0;
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
+  &.has-more {
+    margin-bottom: 2rem;
   }
 }
 </style>
