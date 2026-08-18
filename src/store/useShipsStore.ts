@@ -1,11 +1,14 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, shallowRef, markRaw, watch } from 'vue';
 import { fetchShipsData } from '../services/api';
 import type { RawShip, RawNation, RawVehicleType, Ship, Nation, VehicleType } from '../types/shipTypes';
 
 const LANG_STORAGE_KEY = 'wow-catalog-lang';
 const DEFAULT_LANG = 'en';
 const ITEMS_PER_PAGE = 20;
+
+
+const titleCollator = new Intl.Collator(undefined);
 
 function getSavedLanguage(): string {
   if (typeof localStorage !== 'undefined') {
@@ -33,9 +36,9 @@ function getLocalizedShipDescription(localization: any, lang: string): string {
 }
 
 export const useShipsStore = defineStore('ships', () => {
-  const rawShips = ref<RawShip[]>([]);
-  const rawNations = ref<Record<string, RawNation>>({});
-  const rawTypes = ref<Record<string, RawVehicleType>>({});
+  const rawShips = shallowRef<RawShip[]>([]);
+  const rawNations = shallowRef<Record<string, RawNation>>({});
+  const rawTypes = shallowRef<Record<string, RawVehicleType>>({});
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const currentLanguage = ref<string>(getSavedLanguage());
@@ -89,7 +92,7 @@ export const useShipsStore = defineStore('ships', () => {
     currentPage.value = 1;
     try {
       const data = await fetchShipsData();
-      rawShips.value = data.ships;
+      rawShips.value = markRaw(data.ships);
       rawNations.value = data.nations;
       rawTypes.value = data.types;
       if (data.languages) {
@@ -122,6 +125,14 @@ export const useShipsStore = defineStore('ships', () => {
     currentPage.value++;
   }
 
+  // Без сброса страницы новый результат фильтрации сразу отрисуется столько сколько было отрисовано
+  watch(
+    [searchQuery, selectedNation, selectedType, selectedTier, isPremiumOnly, sortBy],
+    () => {
+      currentPage.value = 1;
+    }
+  );
+
   const allFilteredShips = computed(() => {
     let result = ships.value.filter(ship => {
       if (searchQuery.value && !ship.title.toLowerCase().includes(searchQuery.value.toLowerCase())) {
@@ -139,7 +150,7 @@ export const useShipsStore = defineStore('ships', () => {
     } else if (sortBy.value === 'level-asc') {
       result.sort((a, b) => a.level - b.level);
     } else if (sortBy.value === 'title') {
-      result.sort((a, b) => a.title.localeCompare(b.title));
+      result.sort((a, b) => titleCollator.compare(a.title, b.title));
     }
 
     return result;
