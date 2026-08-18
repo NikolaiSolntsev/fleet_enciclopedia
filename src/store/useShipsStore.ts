@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, shallowRef, markRaw, watch } from 'vue';
 import { fetchShipsData } from '../services/api';
+import { pickLocalized } from '@/utils/localization';
 import type { RawShip, RawNation, RawVehicleType, Ship, Nation, VehicleType } from '../types/shipTypes';
 
 const LANG_STORAGE_KEY = 'wow-catalog-lang';
@@ -21,18 +22,6 @@ function saveLanguage(lang: string): void {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem(LANG_STORAGE_KEY, lang);
   }
-}
-
-function getLocalizedTitle(localization: any, lang: string, fallback: string): string {
-  return localization?.mark?.[lang] || localization?.mark?.en || fallback;
-}
-
-function getLocalizedShipTitle(localization: any, lang: string, fallback: string): string {
-  return localization?.shortmark?.[lang] || localization?.shortmark?.en || fallback;
-}
-
-function getLocalizedShipDescription(localization: any, lang: string): string {
-  return localization?.description?.[lang] || localization?.description?.en || '';
 }
 
 export const useShipsStore = defineStore('ships', () => {
@@ -61,7 +50,7 @@ export const useShipsStore = defineStore('ships', () => {
     Object.entries(rawNations.value).forEach(([key, nation]) => {
       result[key] = {
         ...nation,
-        title: getLocalizedTitle(nation.localization, currentLanguage.value, nation.name || key)
+        title: pickLocalized(nation.localization, 'mark', currentLanguage.value, nation.name || key)
       };
     });
     return result;
@@ -72,7 +61,7 @@ export const useShipsStore = defineStore('ships', () => {
     Object.entries(rawTypes.value).forEach(([key, type]) => {
       result[key] = {
         ...type,
-        title: getLocalizedTitle(type.localization, currentLanguage.value, key)
+        title: pickLocalized(type.localization, 'mark', currentLanguage.value, key)
       };
     });
     return result;
@@ -81,8 +70,8 @@ export const useShipsStore = defineStore('ships', () => {
   const ships = computed<Ship[]>(() => {
     return rawShips.value.map(ship => ({
       ...ship,
-      title: getLocalizedShipTitle(ship.localization, currentLanguage.value, ship.name),
-      description: getLocalizedShipDescription(ship.localization, currentLanguage.value)
+      title: pickLocalized(ship.localization, 'shortmark', currentLanguage.value, ship.name),
+      description: pickLocalized(ship.localization, 'description', currentLanguage.value)
     }));
   });
 

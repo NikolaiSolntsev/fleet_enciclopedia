@@ -1,19 +1,45 @@
 import type { RawShip, RawNation, RawVehicleType } from '../types/shipTypes';
+import { withMediaPath, FALLBACK_MEDIA_PATH } from '@/utils/icons';
 
-const BASE_URL = '/api-wows/api/encyclopedia/en';
+const API_BASE = import.meta.env.VITE_API_BASE || '/api-wows';
+const BASE_URL = `${API_BASE}/api/encyclopedia/en`;
+
+interface RawNationResponse {
+  name?: string;
+  color?: number;
+  localization?: Record<string, Record<string, string>>;
+  icons?: Record<string, unknown>;
+}
+
+interface RawVehicleTypeResponse {
+  localization?: Record<string, Record<string, string>>;
+  icons?: Record<string, unknown>;
+}
+
+interface RawVehicleResponse {
+  name?: string;
+  level?: number;
+  nation?: string;
+  tags?: string[];
+  icons?: Record<string, unknown>;
+  localization?: {
+    shortmark?: Record<string, string>;
+    description?: Record<string, string>;
+  };
+}
 
 interface ApiBaseResponse {
   status: string;
   data: {
-    nations?: Record<string, any>;
-    vehicle_types_common?: Record<string, any>;
+    nations?: RawNationResponse[];
+    vehicle_types_common?: Record<string, RawVehicleTypeResponse>;
     language_list?: string[];
   };
 }
 
 interface VehiclesResponse {
   status: string;
-  data: Record<string, any>;
+  data: Record<string, RawVehicleResponse>;
 }
 
 interface MediaPathResponse {
@@ -23,16 +49,6 @@ interface MediaPathResponse {
 
 let mediaPathCache: string | null = null;
 let languagesCache: string[] = [];
-
-function withMediaPath(icons: Record<string, any> | undefined, mediaPath: string): Record<string, string> {
-  const result: Record<string, string> = {};
-  Object.entries(icons || {}).forEach(([key, path]) => {
-    if (typeof path === 'string' && path) {
-      result[key] = `${mediaPath}${path}`;
-    }
-  });
-  return result;
-}
 
 async function getMediaPath(): Promise<string> {
   if (mediaPathCache) return mediaPathCache;
@@ -46,13 +62,15 @@ async function getMediaPath(): Promise<string> {
   } catch {
     console.warn('Failed to fetch media_path, using default');
   }
-  return 'https://wows-gloss-icons.wgcdn.co/icons/';
+  return FALLBACK_MEDIA_PATH;
 }
 
 export async function fetchShipsData() {
-  const [baseRes, vehiclesRes] = await Promise.all([
+
+  const [baseRes, vehiclesRes, mediaPath] = await Promise.all([
     fetch(`${BASE_URL}/`),
-    fetch(`${BASE_URL}/vehicles/`)
+    fetch(`${BASE_URL}/vehicles/`),
+    getMediaPath()
   ]);
 
   if (!baseRes.ok || !vehiclesRes.ok) {
@@ -66,48 +84,42 @@ export async function fetchShipsData() {
     languagesCache = baseData.data.language_list;
   }
 
-  const mediaPath = await getMediaPath();
-
   const nationsRecord: Record<string, RawNation> = {};
-  if (baseData.data.nations) {
-    Object.entries(baseData.data.nations).forEach(([key, nation]: [string, any]) => {
-      nationsRecord[key] = {
-        name: nation.name || key,
-        color: nation.color || 0,
-        localization: nation.localization,
-        icons: withMediaPath(nation.icons, mediaPath)
-      };
-    });
-  }
+  (baseData.data.nations || []).forEach((nation, index) => {
+    const key = nation.name || String(index);
+    nationsRecord[key] = {
+      name: key,
+      color: nation.color || 0,
+      localization: nation.localization,
+      icons: withMediaPath(nation.icons, mediaPath)
+    };
+  });
 
   const typesRecord: Record<string, RawVehicleType> = {};
-  if (baseData.data.vehicle_types_common) {
-    Object.entries(baseData.data.vehicle_types_common).forEach(([key, type]: [string, any]) => {
-      typesRecord[key] = {
-        name: key,
-        localization: type.localization,
-        icons: withMediaPath(type.icons, mediaPath)
-      };
-    });
-  }
+  Object.entries(baseData.data.vehicle_types_common || {}).forEach(([key, type]) => {
+    typesRecord[key] = {
+      name: key,
+      localization: type.localization,
+      icons: withMediaPath(type.icons, mediaPath)
+    };
+  });
+
+  const knownTypes = new Set(Object.keys(typesRecord));
 
   const ships: RawShip[] = [];
-  Object.entries(vehiclesData.data).forEach(([id, vehicle]: [string, any]) => {
+  Object.entries(vehiclesData.data).forEach(([id, vehicle]) => {
     const tags = vehicle.tags || [];
-    const shipType = tags.find((tag: string) => Object.keys(typesRecord).includes(tag)) || 'Unknown';
-
-    const fullIcons = withMediaPath(vehicle.icons, mediaPath);
 
     ships.push({
       id: parseInt(id) || id,
       name: vehicle.name || '',
       level: vehicle.level || 0,
-      nation: extractNationFromName(vehicle.name, Object.keys(nationsRecord)),
-      type: shipType,
-      is_premium: tags.includes('uiPremium') || false,
-      is_special: tags.includes('special') || tags.includes('uiSpecial') || false,
+      nation: vehicle.nation || 'unknown',
+      type: tags.find(tag => knownTypes.has(tag)) || 'Unknown',
+      is_premium: tags.includes('uiPremium'),
+      is_special: tags.includes('special') || tags.includes('uiSpecial'),
       tags,
-      icons: fullIcons,
+      icons: withMediaPath(vehicle.icons, mediaPath),
       localization: {
         shortmark: vehicle.localization?.shortmark || {},
         description: vehicle.localization?.description || {}
@@ -121,17 +133,4 @@ export async function fetchShipsData() {
     types: typesRecord,
     languages: languagesCache
   };
-}
-
-export function getAvailableLanguages(): string[] {
-  return languagesCache;
-}
-
-function extractNationFromName(shipName: string, nations: string[]): string {
-  for (const nation of nations) {
-    if (shipName.toLowerCase().includes(nation.toLowerCase())) {
-      return nation;
-    }
-  }
-  return nations[0] || 'ussr';
 }
