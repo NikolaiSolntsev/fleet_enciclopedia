@@ -24,5 +24,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api-wows/, '')
       }
     }
+  },
+  preview: {
+    proxy: {
+      '/api-wows': {
+        target: 'https://vortex.worldofwarships.eu',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-wows/, '')
+      }
+    }
   }
 });
