@@ -117,6 +117,8 @@ onMounted(() => {
   padding: 1rem 0.75rem;
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 </style>
